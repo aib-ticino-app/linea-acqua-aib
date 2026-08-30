@@ -94268,9 +94268,9 @@ q.push("Tratta Finale da "+A.l.t(h)+"m ad Arrivo ("+A.n.a1(a.cy,0)+"m): "+c+a0+a
 a.fr=g
 r=B.aa(a1).i("aj<1,aV<p,J>>")
 b=B.S(new B.aj(a1,new B.aox(),r),r.i("aH.E"))
-a1="https://aib-ticino-app.github.io/linea-acqua-aib/#viewer="+B.t9(2,A.e8.Vo(b,null),A.aC,!1)
+a1="https://aib-ticino-app.github.io/linea-acqua-aib/viewer.html#viewer="+B.t9(2,A.e8.Vo(b,null),A.aC,!1)
 a.ok=a1
-a.p1="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data="+B.t9(2,a1,A.aC,!1)
+a.p1="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data="+B.t9(2,a1,A.aC,!1)
 a.ao(new B.aoy(a))},
 agg(){this.ao(new B.aoA(this))},
 t0(){var s=0,r=B.Q(t.H),q=this,p,o,n,m
@@ -94279,7 +94279,7 @@ for(;;)switch(s){case 0:m=q.as
 if(m==="MOTOPOMPA")p="Motopompa Honda "+q.at
 else p=m==="BOTTE"?"Botte AIB Automezzo":"Acqua Libera: "+q.ax
 o=A.o.bt(q.k4,"\n\u2022 ")
-n=B.fy("https://api.whatsapp.com/send?text="+B.t9(2,"*PROGETTO CONDOTTA AIB - PARCO TICINO*\n-----------------------------------\n\u2022 Fonte Principale: "+p+"\n\u2022 Sviluppo percorso: "+A.n.a1(q.cy,0)+" m\n\u2022 Dislivello stimato: +"+q.db+" m\n\u2022 Portata obiettivo (Q): "+q.CW+" l/min\n\u2022 Perdite di carico: "+A.n.a1(q.dy,2)+" bar\n\u2022 Pressione Richiesta alla Fonte: "+A.n.a1(q.dx,1)+" bar\n\u2022 Stazioni di Rilancio in Serie: "+q.fy+" pz\n-----------------------------------\n*COMPOSIZIONE TUBI TRATTA PER TRATTA:*\n\u2022 "+o+"\n-----------------------------------\n*RIEPILOGO MATERIALI:*\n\u2022 Aspirazione / Connessione: 1 pz\n\u2022 Divisori a 3 vie (X): "+q.fx+" pz\n\u2022 *Totale Manichette Impiegate: "+q.fr+" pz*\n-----------------------------------\n\u2022 *Destinazione:* "+q.go+"\n\u2022 "+q.k1+"\n\u2022 \ud83d\uddfa *Visualizzatore Tracciato Boschivo:* "+q.ok,A.aC,!1),0,null)
+n=B.fy("https://api.whatsapp.com/send?text="+B.t9(2,"*PROGETTO CONDOTTA AIB - PARCO TICINO*\n-----------------------------------\n\u2022 Fonte Principale: "+p+"\n\u2022 Sviluppo percorso: "+A.n.a1(q.cy,0)+" m\n\u2022 Dislivello stimato: +"+q.db+" m\n\u2022 Portata obiettivo (Q): "+q.CW+" l/min\n\u2022 Perdite di carico: "+A.n.a1(q.dy,2)+" bar\n\u2022 Pressione Richiesta alla Fonte: "+A.n.a1(q.dx,1)+" bar\n\u2022 Stazioni di Rilancio in Serie: "+q.fy+" pz\n-----------------------------------\n*COMPOSIZIONE TUBI TRATTA PER TRATTA:*\n\u2022 "+o+"\n-----------------------------------\n*RIEPILOGO MATERIALI:*\n\u2022 Aspirazione / Connessione: 1 pz\n\u2022 Divisori a 3 vie (X): "+q.fx+" pz\n\u2022 *Totale Manichette Impiegate: "+q.fr+" pz*\n-----------------------------------\n\u2022 *Destinazione:* "+q.go+"\n\u2022 "+q.k1+"\n\u2022 \ud83d\uddfa *Mappa Tracciato Boschivo Leaflet:* "+q.ok,A.aC,!1),0,null)
 s=4
 return B.I(B.aA9(n),$async$t0)
 case 4:s=b?2:3
@@ -94487,7 +94487,7 @@ r=k.k1
 if(r.length!==0)A.o.N(s,B.b([new B.eG(o,3,o),B.e7("- "+r,A.aRk)],n))
 s=B.b([new B.un(3,A.QV,B.a3z(s,A.ft))],n)
 l=l.b
-if(l!=null)A.o.N(s,B.b([new B.eG(10,o,o),B.a3z(B.b([B.a3E(B.aDh(l),o,60,o,o,60),new B.eG(o,2,o),B.e7("Scannerizza Mappa",A.aPT)],n),A.rB)],n))
+if(l!=null)A.o.N(s,B.b([new B.eG(10,o,o),B.a3z(B.b([B.a3E(B.aDh(l),o,75,o,o,75),new B.eG(o,2,o),B.e7("Scannerizza Mappa",A.aPT)],n),A.rB)],n))
 m=B.b([m,new B.eG(o,6,o),new B.LB(1.5),new B.eG(o,6,o),B.aEV(s,A.ft,A.E6),new B.eG(o,6,o),B.e7("SCHEMA LINEA & STAZIONI:",B.kJ(o,o,o,o,o,o,o,o,o,A.bq,o,o,10,o,A.bg,o,!0,o,o,o,o)),new B.eG(o,3,o)],n)
 l=k.k3
 A.o.N(m,new B.aj(l,new B.aoB(),B.aa(l).i("aj<1,cO>")))
