@@ -11,8 +11,8 @@
         #map { height: 100%; width: 100%; }
         #info-box {
             position: absolute; top: 10px; right: 10px; z-index: 1000;
-            background: white; padding: 10px 15px; border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 13px; max-width: 260px;
+            background: white; padding: 12px 15px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 13px; max-width: 280px;
         }
         #info-box h4 { margin: 0 0 5px 0; color: #003399; font-size: 14px; }
         .marker-divisore {
@@ -24,12 +24,21 @@
             text-align: center; font-weight: bold; color: red; font-size: 9px; line-height: 28px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
+        .btn-navigazione {
+            display: block; margin-top: 8px; width: 100%; padding: 8px 10px;
+            background-color: #003399; color: white; text-align: center; text-decoration: none;
+            border-radius: 4px; font-weight: bold; font-size: 12px; box-sizing: border-box;
+        }
+        .btn-maps {
+            background-color: #25D366;
+        }
     </style>
 </head>
 <body>
     <div id="info-box">
         <h4>Tracciato Condotta AIB</h4>
         <div id="details">Caricamento percorso...</div>
+        <div id="nav-container"></div>
     </div>
     <div id="map"></div>
 
@@ -56,9 +65,8 @@
             return null;
         }
 
-        // Funzione per calcolare la distanza in metri tra due coordinate GPS (Haversine)
         function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-            var R = 6371000; // Radius of the earth in m
+            var R = 6371000;
             var dLat = deg2rad(lat2-lat1);
             var dLon = deg2rad(lon2-lon1);
             var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -73,23 +81,25 @@
         if (punti && punti.length > 0) {
             let latLngs = punti.map(p => [p.lat, p.lng]);
 
-            // Disegna polilinea principale
-            const polyline = L.polyline(latLngs, {color: '#003399', weight: 5, opacity: 0.8}).addTo(map);
+            // Disegna la polilinea esatta della condotta
+            const polyline = L.polyline(latLngs, {color: '#003399', weight: 6, opacity: 0.9}).addTo(map);
             map.fitBounds(polyline.getBounds(), {padding: [50, 50]});
 
-            // Marker Partenza (A)
+            // Partenza (A)
             L.marker([punti[0].lat, punti[0].lng]).addTo(map).bindPopup("<b>Partenza (A)</b>");
 
-            // Marker Arrivo (B)
+            // Arrivo (B)
+            let ultimoPunto = punti[punti.length-1];
             if (punti.length > 1) {
-                L.marker([punti[punti.length-1].lat, punti[punti.length-1].lng]).addTo(map).bindPopup("<b>Arrivo (B)</b>");
+                L.marker([ultimoPunto.lat, ultimoPunto.lng]).addTo(map).bindPopup("<b>Arrivo (B)</b>");
             }
 
-            // Calcolo e posizionamento Divisori (X) e Rilanci (RIL) ogni 100m lungo la spezzata
+            // Generazione automatica Divisori e Rilanci sul tracciato
             let distanzaAccumulata = 0;
             let prossimoTarget = 100;
             let numDivisori = 0;
             let numRilanci = 0;
+            let listaWaypointTracciato = [punti[0]];
 
             for (let i = 0; i < punti.length - 1; i++) {
                 let p1 = punti[i];
@@ -101,39 +111,46 @@
                     let latDiv = p1.lat + (p2.lat - p1.lat) * frazione;
                     let lngDiv = p1.lng + (p2.lng - p1.lng) * frazione;
 
+                    let wpt = {lat: latDiv, lng: lngDiv};
+                    listaWaypointTracciato.push(wpt);
+
                     if ((prossimoTarget % 200) === 0) {
                         numRilanci++;
                         L.marker([latDiv, lngDiv], {
-                            icon: L.divIcon({
-                                className: 'marker-rilancio',
-                                html: 'RIL',
-                                iconSize: [30, 30]
-                            })
+                            icon: L.divIcon({ className: 'marker-rilancio', html: 'RIL', iconSize: [30, 30] })
                         }).addTo(map).bindPopup("<b>Stazione Rilancio (RIL)</b><br>Progressiva: " + prossimoTarget + "m");
                     } else {
                         numDivisori++;
                         L.marker([latDiv, lngDiv], {
-                            icon: L.divIcon({
-                                className: 'marker-divisore',
-                                html: 'X',
-                                iconSize: [20, 20]
-                            })
+                            icon: L.divIcon({ className: 'marker-divisore', html: 'X', iconSize: [20, 20] })
                         }).addTo(map).bindPopup("<b>Divisore a 3 vie (X)</b><br>Progressiva: " + prossimoTarget + "m");
                     }
                     prossimoTarget += 100;
                 }
                 distanzaAccumulata += distSegmento;
             }
+            listaWaypointTracciato.push(ultimoPunto);
 
             document.getElementById('details').innerHTML = 
-                "<b>Punti rotta:</b> " + punti.length + "<br>" +
-                "<b>Divisori (X):</b> " + numDivisori + "<br>" +
-                "<b>Rilanci (RIL):</b> " + numRilanci;
+                "<b>Sviluppo linea:</b> " + Math.round(distanzaAccumulata) + "m<br>" +
+                "<b>Divisori (X):</b> " + numDivisori + " | <b>Rilanci:</b> " + numRilanci;
+
+            // Costruzione link di navigazione guidata lungo i punti intermedi della condotta
+            // Seleziona il punto intermedio o l'arrivo per guidare l'operatore passo dopo passo sulla condotta
+            let waypointIntermedio = listaWaypointTracciato.length > 2 ? listaWaypointTracciato[1] : ultimoPunto;
+            let navTracciatoUrl = `https://www.google.com/maps/dir/?api=1&destination=${ultimoPunto.lat},${ultimoPunto.lng}&waypoints=${waypointIntermedio.lat},${waypointIntermedio.lng}&travelmode=walking`;
+            let navMapsUrl = `https://www.google.com/maps/search/?api=1&query=${ultimoPunto.lat},${ultimoPunto.lng}`;
+
+            document.getElementById('nav-container').innerHTML = `
+                <a href="${navTracciatoUrl}" target="_blank" class="btn-navigazione">📍 Segui Tracciato Condotta</a>
+                <a href="${navMapsUrl}" target="_blank" class="btn-navigazione btn-maps">🧭 Apri in Google Maps</a>
+            `;
+
         } else {
             document.getElementById('details').innerHTML = "Nessun tracciato specificato.";
         }
 
-        // GPS live utente
+        // Posizione GPS live dell'operatore nel bosco rispetto alla condotta
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(position => {
                 const lat = position.coords.latitude;
@@ -141,7 +158,7 @@
                 if (!window.userMarker) {
                     window.userMarker = L.circleMarker([lat, lng], {
                         radius: 8, color: '#fff', fillColor: '#2196F3', fillOpacity: 1, weight: 3
-                    }).addTo(map).bindPopup("La tua posizione GPS");
+                    }).addTo(map).bindPopup("La tua posizione GPS nel bosco");
                 } else {
                     window.userMarker.setLatLng([lat, lng]);
                 }
