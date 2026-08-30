@@ -94273,19 +94273,21 @@ a.ok=a1
 a.p1="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data="+B.t9(2,a1,A.aC,!1)
 a.ao(new B.aoy(a))},
 agg(){this.ao(new B.aoA(this))},
-t0(){var s=0,r=B.Q(t.H),q=this,p,o,n,m
+t0(){var s=0,r=B.Q(t.H),q=this,p,o,n,m,l
 var $async$t0=B.R(function(a,b){if(a===1)return B.N(b,r)
-for(;;)switch(s){case 0:m=q.as
-if(m==="MOTOPOMPA")p="Motopompa Honda "+q.at
-else p=m==="BOTTE"?"Botte AIB Automezzo":"Acqua Libera: "+q.ax
+for(;;)switch(s){case 0:l=q.as
+if(l==="MOTOPOMPA")p="Motopompa Honda "+q.at
+else p=l==="BOTTE"?"Botte AIB Automezzo":"Acqua Libera: "+q.ax
 o=A.o.bt(q.k4,"\n\u2022 ")
-n=B.fy("https://api.whatsapp.com/send?text="+B.t9(2,"*PROGETTO CONDOTTA AIB - PARCO TICINO*\n-----------------------------------\n\u2022 Fonte Principale: "+p+"\n\u2022 Sviluppo percorso: "+A.n.a1(q.cy,0)+" m\n\u2022 Dislivello stimato: +"+q.db+" m\n\u2022 Portata obiettivo (Q): "+q.CW+" l/min\n\u2022 Perdite di carico: "+A.n.a1(q.dy,2)+" bar\n\u2022 Pressione Richiesta alla Fonte: "+A.n.a1(q.dx,1)+" bar\n\u2022 Stazioni di Rilancio in Serie: "+q.fy+" pz\n-----------------------------------\n*COMPOSIZIONE TUBI TRATTA PER TRATTA:*\n\u2022 "+o+"\n-----------------------------------\n*RIEPILOGO MATERIALI:*\n\u2022 Aspirazione / Connessione: 1 pz\n\u2022 Divisori a 3 vie (X): "+q.fx+" pz\n\u2022 *Totale Manichette Impiegate: "+q.fr+" pz*\n-----------------------------------\n\u2022 *Destinazione:* "+q.go+"\n\u2022 "+q.k1+"\n\u2022 \ud83d\uddfa *App Condotta AIB:* https://aib-ticino-app.github.io/linea-acqua-aib/",A.aC,!1),0,null)
+n=q.ok
+n=n.length!==0?n:"https://aib-ticino-app.github.io/linea-acqua-aib/viewer.html"
+m=B.fy("https://api.whatsapp.com/send?text="+B.t9(2,"*PROGETTO CONDOTTA AIB - PARCO TICINO*\n-----------------------------------\n\u2022 Fonte Principale: "+p+"\n\u2022 Sviluppo percorso: "+A.n.a1(q.cy,0)+" m\n\u2022 Dislivello stimato: +"+q.db+" m\n\u2022 Portata obiettivo (Q): "+q.CW+" l/min\n\u2022 Perdite di carico: "+A.n.a1(q.dy,2)+" bar\n\u2022 Pressione Richiesta alla Fonte: "+A.n.a1(q.dx,1)+" bar\n\u2022 Stazioni di Rilancio in Serie: "+q.fy+" pz\n-----------------------------------\n*COMPOSIZIONE TUBI TRATTA PER TRATTA:*\n\u2022 "+o+"\n-----------------------------------\n*RIEPILOGO MATERIALI:*\n\u2022 Aspirazione / Connessione: 1 pz\n\u2022 Divisori a 3 vie (X): "+q.fx+" pz\n\u2022 *Totale Manichette Impiegate: "+q.fr+" pz*\n-----------------------------------\n\u2022 *Destinazione:* "+q.go+"\n\u2022 "+q.k1+"\n\u2022 \ud83d\uddfa *Apri Mappa & Naviga sul Tracciato:* "+n,A.aC,!1),0,null)
 s=4
-return B.I(B.aA9(n),$async$t0)
+return B.I(B.aA9(m),$async$t0)
 case 4:s=b?2:3
 break
 case 2:s=5
-return B.I(B.aAt(n,A.Sg),$async$t0)
+return B.I(B.aAt(m,A.Sg),$async$t0)
 case 5:case 3:return B.O(null,r)}})
 return B.P($async$t0,r)},
 q2(){return this.agG()},
