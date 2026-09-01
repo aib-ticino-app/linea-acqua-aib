@@ -31,7 +31,6 @@
         }
         .btn-maps { background-color: #25D366; }
         
-        /* Stile pulsante Bussola & Indicatori Cardinali */
         #compass-btn {
             position: absolute; top: 10px; left: 10px; z-index: 1000;
             background: white; border: 2px solid #ccc; border-radius: 8px;
@@ -39,20 +38,23 @@
             align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             font-size: 20px; font-weight: bold; color: #003399; transition: all 0.2s;
         }
-        #compass-btn.active {
-            border-color: #003399; background: #e8f0fe;
-        }
+        #compass-btn.active { border-color: #003399; background: #e8f0fe; }
+        
         .cardinal-indicator {
             position: absolute; bottom: 20px; left: 20px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.9); padding: 8px 12px; border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: bold; font-size: 11px; color: #333;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.95); padding: 10px 14px; border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 11px; color: #333;
+            min-width: 170px;
         }
     </style>
 </head>
 <body>
     <div id="compass-btn" title="Attiva/Disattiva Bussola" onclick="toggleCompass()">N</div>
-    <div class="cardinal-indicator">📍 ORIENTAMENTO<br><span id="cardinal-text" style="color: #003399; font-size: 12px;">Nord ▲ | Est ►</span></div>
+    
+    <div class="cardinal-indicator">
+        <div style="font-weight: bold; color: #666; margin-bottom: 2px;">📍 ORIENTAMENTO TRACCIATO</div>
+        <div id="cardinal-text" style="color: #003399; font-size: 12px; font-weight: bold;">Calcolo in corso...</div>
+    </div>
     
     <div id="info-box">
         <h4>Tracciato Condotta AIB</h4>
@@ -96,6 +98,31 @@
         }
         function deg2rad(deg) { return deg * (Math.PI/180); }
 
+        function calcolaAzimut(p1, p2) {
+            let lat1 = p1.lat * Math.PI / 180;
+            let lon1 = p1.lng * Math.PI / 180;
+            let lat2 = p2.lat * Math.PI / 180;
+            let lon2 = p2.lng * Math.PI / 180;
+            let dLon = lon2 - lon1;
+            let y = Math.sin(dLon) * Math.cos(lat2);
+            let x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+            let rad = Math.atan2(y, x);
+            let deg = rad * 180 / Math.PI;
+            return (deg + 360) % 360;
+        }
+
+        function getDirezioneTesto(azimut) {
+            if (azimut >= 337.5 || azimut < 22.5) return "Nord (N)";
+            if (azimut >= 22.5 && azimut < 67.5) return "Nord-Est (NE)";
+            if (azimut >= 67.5 && azimut < 112.5) return "Est (E)";
+            if (azimut >= 112.5 && azimut < 157.5) return "Sud-Est (SE)";
+            if (azimut >= 157.5 && azimut < 202.5) return "Sud (S)";
+            if (azimut >= 202.5 && azimut < 247.5) return "Sud-Ovest (SW)";
+            if (azimut >= 247.5 && azimut < 292.5) return "Ovest (W)";
+            if (azimut >= 292.5 && azimut < 337.5) return "Nord-Ovest (NW)";
+            return "Nord (N)";
+        }
+
         const punti = getCoordsFromUrl();
         if (punti && punti.length > 0) {
             let latLngs = punti.map(p => [p.lat, p.lng]);
@@ -109,6 +136,11 @@
             if (punti.length > 1) {
                 L.marker([ultimoPunto.lat, ultimoPunto.lng]).addTo(map).bindPopup("<b>Arrivo (B)</b>");
             }
+
+            // Calcolo orientamento complessivo della linea (da A a B)
+            let azimutLinea = calcolaAzimut(punti[0], ultimoPunto);
+            let dirTesto = getDirezioneTesto(azimutLinea);
+            document.getElementById('cardinal-text').innerHTML = `${dirTesto} &bull; ${Math.round(azimutLinea)}°`;
 
             let distanzaAccumulata = 0;
             let prossimoTarget = 100;
@@ -163,54 +195,28 @@
             document.getElementById('details').innerHTML = "Nessun tracciato specificato.";
         }
 
-        // --- GESTIONE BUSSOLA E DIREZIONE CARDINALE ---
         let compassActive = false;
-
         function toggleCompass() {
             compassActive = !compassActive;
             const btn = document.getElementById('compass-btn');
             if (compassActive) {
                 btn.classList.add('active');
-                startCompass();
+                if (window.DeviceOrientationEvent) {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                }
             } else {
                 btn.classList.remove('active');
+                window.removeEventListener('deviceorientation', handleOrientation, true);
                 btn.style.transform = "rotate(0deg)";
-                document.getElementById('cardinal-text').innerText = "Nord ▲ | Est ►";
-                stopCompass();
             }
-        }
-
-        function startCompass() {
-            if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', handleOrientation, true);
-            } else {
-                alert("Sensore bussola non supportato.");
-                toggleCompass();
-            }
-        }
-
-        function stopCompass() {
-            window.removeEventListener('deviceorientation', handleOrientation, true);
         }
 
         function handleOrientation(event) {
             if (!compassActive) return;
-            let alpha = event.alpha; // Direzione (0-360)
+            let alpha = event.alpha;
             if (alpha !== null) {
                 const btn = document.getElementById('compass-btn');
                 btn.style.transform = `rotate(${-alpha}deg)`;
-                
-                // Determina la direzione cardinale principale
-                let cardinal = "N";
-                if (alpha >= 22.5 && alpha < 67.5) cardinal = "NE (Nord-Est)";
-                else if (alpha >= 67.5 && alpha < 112.5) cardinal = "E (Est)";
-                else if (alpha >= 112.5 && alpha < 157.5) cardinal = "SE (Sud-Est)";
-                else if (alpha >= 157.5 && alpha < 202.5) cardinal = "S (Sud)";
-                else if (alpha >= 202.5 && alpha < 247.5) cardinal = "SW (Sud-Ovest)";
-                else if (alpha >= 247.5 && alpha < 292.5) cardinal = "W (Ovest)";
-                else if (alpha >= 292.5 && alpha < 337.5) cardinal = "NW (Nord-Ovest)";
-                
-                document.getElementById('cardinal-text').innerText = `${cardinal} (${Math.round(alpha)}°)`;
             }
         }
 
